@@ -5,10 +5,10 @@
 4. In BPCWIP excel, need to insert the new col called "PP_name", logic as follwoing 
 (Firstexcel[WIRE] == BPCWIP[WIREPN] , Firstexcel[CAPILLARY] == BPCWIP[CAPILLARY] , Firstexcel[Device] == BPCWIP[Device] , If all same, bring the Firstexcel[PP_NAME] in this col)
 
-4. In Machine_setup, please see the device, if device name in BPCWIP excel and BPCWIP[STATUS] == "Non-RTD Standby" and machine_setup[pp] == BPCWIP[PP_Name] 
+5. In Machine_setup, please see the device, if device name in BPCWIP excel and BPCWIP[STATUS] == "Non-RTD Standby" and machine_setup[pp] == BPCWIP[PP_Name] 
    Insert the information into the Final_excel as first Ranking_1
 
-5. In Machine_setup, please see the device, if no any device name in BPCWIP, Insert the information into the Final_excel based on PPH model survey in second.xlsx.
+6. In Machine_setup, please see the device, if no any device name in BPCWIP, Insert the information into the Final_excel based on PPH model survey in second.xlsx.
    Group by machine , Need to based on the second.xlsx, and rank by PPH , to see if any device DEV_ALIAS + PP in BPCWIP excel same as PP_name + device in second.xlsx
 
 

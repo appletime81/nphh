@@ -1,0 +1,11 @@
+1. wip_arrangement -> template_1(紅色col直接複製，黃色按wip_arrangement的公式)
+2. Firstexcel[WIRE] == BPCWIP[WIREPN] , 
+   Firstexcel[CAPILLARY] == BPCWIP[CAPILLARY] , 
+   Firstexcel[Device] == BPCWIP[Device] , 
+   以上成立 "bring the Firstexcel[PP_NAME] in this col"
+3. Final_excel "LOC", "LOT" in BPCWIP first two cols
+4. 均分 
+
+5. 5批 10台 剩8台
+
+6. machine_setup PP 去 BPCWIP找 可排上的材料
