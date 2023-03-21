@@ -1,3 +1,4 @@
+import time
 import polars as pl
 import pandas as pd
 from pprint import pprint
@@ -36,6 +37,26 @@ def step1():
     df_new = pl.from_dict(new_dict)
     df_new.write_excel("template_1.xlsx", table_name="DEV_DB")
 
+def step2():
+    """
+    In BPCWIP excel, need to insert the new col called "PP_name", logic as follwoing
+    (Firstexcel[WIRE] == BPCWIP[WIREPN],
+     Firstexcel[CAPILLARY] == BPCWIP[CAPILLARY],
+     Firstexcel[Device] == BPCWIP[Device],
+     If all same, bring the Firstexcel[PP_NAME] in this col)
+    """
+    # df_first_excel = pl.read_excel("First.xlsx")
+    df_bpcwip = pd.read_excel("BPCWIP.xlsx")
+
+
+    print(df_bpcwip)
+    for i in range(len(df_bpcwip)):
+        wirepn = df_bpcwip.loc[i, "WIREPN"]
+        capillary = df_bpcwip.loc[i, "CAPILLARY"]
+        device = df_bpcwip.loc[i, "DEVICE"]
+        print(wirepn, capillary, device)
+
 
 if __name__ == "__main__":
-    step1()
+    # step1()
+    step2()
