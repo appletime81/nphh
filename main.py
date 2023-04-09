@@ -37,6 +37,7 @@ def step1():
     df_new = pl.from_dict(new_dict)
     df_new.write_excel("template_1.xlsx", table_name="DEV_DB")
 
+
 def step2():
     """
     In BPCWIP excel, need to insert the new col called "PP_name", logic as follwoing
@@ -45,18 +46,50 @@ def step2():
      Firstexcel[Device] == BPCWIP[Device],
      If all same, bring the Firstexcel[PP_NAME] in this col)
     """
-    # df_first_excel = pl.read_excel("First.xlsx")
+    df_first_excel = pd.read_excel("First.xlsx")
     df_bpcwip = pd.read_excel("BPCWIP.xlsx")
 
-
-    print(df_bpcwip)
     for i in range(len(df_bpcwip)):
         wirepn = df_bpcwip.loc[i, "WIREPN"]
         capillary = df_bpcwip.loc[i, "CAPILLARY"]
         device = df_bpcwip.loc[i, "DEVICE"]
-        print(wirepn, capillary, device)
+
+        pp_name = df_first_excel[
+            (df_first_excel["WIRE"] == wirepn)
+            & (df_first_excel["CAPILLARY"] == capillary)
+            & (df_first_excel["DEVICE"] == device)
+        ]["PP_NAME"].values
+        if len(pp_name) == 0:
+            pp_name = ""
+        else:
+            pp_name = pp_name[0]
+        df_bpcwip.loc[i, "PP_NAME"] = pp_name
+    df_bpcwip = df_bpcwip.drop(columns=["PP_Name需要來自First excel"])
+    df_bpcwip.to_excel("BPCWIP_2.xlsx", index=False)
+
+
+def step3():
+    output_data = {
+        "LOC": [],
+        "LOT": [],
+        "EQ_NAME": [],
+        "PP_NAME": [],
+        "DEVICE": [],
+        "NPPH": [],
+        "Ranking:": [],
+    }
+    df_machine_setup = pd.read_excel("machine_setup.xlsx")
+
+    for i in range(len(df_machine_setup)):
+        # output_data["LOC"].append(df_machine_setup.loc[i, "LOC"])
+        # output_data["LOT"].append(df_machine_setup.loc[i, "LOT"])
+        # output_data["EQ_NAME"].append(df_machine_setup.loc[i, "EQ_NAME"])
+        # output_data["PP_NAME"].append(df_machine_setup.loc[i, "PP_NAME"])
+        # output_data["DEVICE"].append(df_machine_setup.loc[i, "DEVICE"])
+        # output_data["NPPH"].append(df_machine_setup.loc[i, "NPPH"])
+        # output_data["Ranking:"].append(df_machine_setup.loc[i, "Ranking:"])
+        pass
 
 
 if __name__ == "__main__":
-    # step1()
-    step2()
+    step3()
