@@ -1,10 +1,8 @@
 import time
-import polars as pl
-import pandas as pd
-import numpy as np
-
-from pprint import pprint
 from copy import deepcopy
+
+import pandas as pd
+import polars as pl
 
 
 def step1():
