@@ -1,7 +1,10 @@
 import time
 import polars as pl
 import pandas as pd
+import numpy as np
+
 from pprint import pprint
+from copy import deepcopy
 
 
 def step1():
@@ -79,16 +82,17 @@ def step3():
         "Ranking:": [],
     }
     df_machine_setup = pd.read_excel("machine_setup.xlsx")
+    df_bpcwip = pd.read_excel("BPCWIP_2.xlsx")
+    df_bpcwip = deepcopy(df_bpcwip)[df_bpcwip["PP_NAME"].notnull()]
 
+    Numbers = []
     for i in range(len(df_machine_setup)):
-        # output_data["LOC"].append(df_machine_setup.loc[i, "LOC"])
-        # output_data["LOT"].append(df_machine_setup.loc[i, "LOT"])
-        # output_data["EQ_NAME"].append(df_machine_setup.loc[i, "EQ_NAME"])
-        # output_data["PP_NAME"].append(df_machine_setup.loc[i, "PP_NAME"])
-        # output_data["DEVICE"].append(df_machine_setup.loc[i, "DEVICE"])
-        # output_data["NPPH"].append(df_machine_setup.loc[i, "NPPH"])
-        # output_data["Ranking:"].append(df_machine_setup.loc[i, "Ranking:"])
-        pass
+        pp_name = df_machine_setup.loc[i, "PP"]
+        print(len(df_bpcwip[df_bpcwip["PP_NAME"] == pp_name]))
+        Numbers.append(len(df_bpcwip[df_bpcwip["PP_NAME"] == pp_name]))
+
+    df_machine_setup["Numbers"] = Numbers
+    df_machine_setup.to_excel("machine_setup_2.xlsx", index=False)
 
 
 if __name__ == "__main__":
