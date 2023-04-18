@@ -49,6 +49,7 @@ def step2():
      Firstexcel[Device] == BPCWIP[Device],
      If all same, bring the Firstexcel[PP_NAME] in this col)
     """
+
     df_first_excel = pd.read_excel("First.xlsx")
     df_bpcwip = pd.read_excel("BPCWIP.xlsx")
 
@@ -81,19 +82,43 @@ def step3():
         "NPPH": [],
         "Ranking:": [],
     }
+    df_template_1 = pd.read_excel("template_1.xlsx")
     df_machine_setup = pd.read_excel("machine_setup.xlsx")
     df_bpcwip = pd.read_excel("BPCWIP_2.xlsx")
     df_bpcwip = deepcopy(df_bpcwip)[df_bpcwip["PP_NAME"].notnull()]
-
-    Numbers = []
+    print("-" * 25 + " template_1.xlsx column name " + "-" * 25)
+    print(df_template_1.columns.tolist())
+    print("-" * 25 + " machine_setup.xlsx column name " + "-" * 25)
+    print(df_machine_setup.columns.tolist())
+    print("-" * 25 + " BPCWIP_2.xlsx column name " + "-" * 25)
+    print(df_bpcwip.columns.tolist())
+    numbers = []
+    nphh_list = []
     for i in range(len(df_machine_setup)):
         pp_name = df_machine_setup.loc[i, "PP"]
-        print(len(df_bpcwip[df_bpcwip["PP_NAME"] == pp_name]))
-        Numbers.append(len(df_bpcwip[df_bpcwip["PP_NAME"] == pp_name]))
+        numbers.append(
+            len(
+                df_bpcwip[
+                    (df_bpcwip["PP_NAME"] == pp_name)
+                    & (df_bpcwip["STATUS"] == "Non-RTD StandBy")
+                ]
+            )
+        )
+        nphh = df_template_1[
+            df_template_1["DEVICE"] == df_machine_setup.loc[i, "DEVICE"]
+        ]["NPPH"].values
+        if len(nphh) == 0:
+            nphh = None
+        else:
+            nphh = nphh[0]
+        nphh_list.append(nphh)
 
-    df_machine_setup["Numbers"] = Numbers
+    df_machine_setup["Numbers"] = numbers
+    df_machine_setup["NPPH"] = nphh_list
     df_machine_setup.to_excel("machine_setup_2.xlsx", index=False)
 
 
 if __name__ == "__main__":
+    start_time = time.time()
     step3()
+    print("--- %s seconds ---" % (time.time() - start_time))
