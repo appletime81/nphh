@@ -1,8 +1,9 @@
 import time
-from copy import deepcopy
-
+import numpy as np
 import pandas as pd
 import polars as pl
+from copy import deepcopy
+from pprint import pprint
 
 
 def step1():
@@ -80,40 +81,63 @@ def step3():
         "NPPH": [],
         "Ranking:": [],
     }
+
     df_template_1 = pd.read_excel("template_1.xlsx")
     df_machine_setup = pd.read_excel("machine_setup.xlsx")
     df_bpcwip = pd.read_excel("BPCWIP_2.xlsx")
     df_bpcwip = deepcopy(df_bpcwip)[df_bpcwip["PP_NAME"].notnull()]
+
     print("-" * 25 + " template_1.xlsx column name " + "-" * 25)
     print(df_template_1.columns.tolist())
     print("-" * 25 + " machine_setup.xlsx column name " + "-" * 25)
     print(df_machine_setup.columns.tolist())
     print("-" * 25 + " BPCWIP_2.xlsx column name " + "-" * 25)
     print(df_bpcwip.columns.tolist())
-    numbers = []
-    nphh_list = []
-    for i in range(len(df_machine_setup)):
-        pp_name = df_machine_setup.loc[i, "PP"]
-        numbers.append(
-            len(
-                df_bpcwip[
-                    (df_bpcwip["PP_NAME"] == pp_name)
-                    & (df_bpcwip["STATUS"] == "Non-RTD StandBy")
-                ]
-            )
-        )
-        nphh = df_template_1[
-            df_template_1["DEVICE"] == df_machine_setup.loc[i, "DEVICE"]
-        ]["NPPH"].values
-        if len(nphh) == 0:
-            nphh = None
-        else:
-            nphh = nphh[0]
-        nphh_list.append(nphh)
 
-    df_machine_setup["Numbers"] = numbers
-    df_machine_setup["NPPH"] = nphh_list
-    df_machine_setup.to_excel("machine_setup_2.xlsx", index=False)
+    filter_condition = {"STATUS": "Non-RTD StandBy"}
+
+    for i in range(len(df_machine_setup)):
+        machine_setup_pp_name = df_machine_setup.loc[i, "PP"]
+        eq_name = df_machine_setup.loc[i, "EQ_NAME"]
+        device = df_machine_setup.loc[i, "DEVICE"]
+        temp_material_data_df = df_bpcwip[
+            (df_bpcwip["PP_NAME"] == machine_setup_pp_name)
+            & (df_bpcwip["STATUS"] == filter_condition["STATUS"])
+        ]
+        if len(temp_material_data_df) > 2:
+            dropped_index_list = temp_material_data_df.index.tolist()[:3]
+
+            # take first 3 rows
+            temp_material_data_df = temp_material_data_df[:3].reset_index(drop=True)
+
+            # add to output_data
+            for j in range(len(temp_material_data_df)):
+                print(temp_material_data_df.loc[j, "LOC"])
+                output_data["LOC"].append(temp_material_data_df.loc[j, "LOC"])
+                output_data["LOT"].append(temp_material_data_df.loc[j, "LOT"])
+                output_data["EQ_NAME"].append(eq_name)
+                output_data["PP_NAME"].append(temp_material_data_df.loc[j, "PP_NAME"])
+                output_data["DEVICE"].append(device)
+                output_data["NPPH"].append(
+                    df_template_1[df_template_1["DEVICE"] == device]["NPPH"].values[0]
+                    if df_template_1[df_template_1["DEVICE"] == device]["NPPH"].values
+                    else np.nan
+                )
+                output_data["Ranking:"].append(j + 1)
+
+            # drop row by index list
+            df_bpcwip = df_bpcwip.drop(dropped_index_list)
+        elif len(temp_material_data_df) <= 2:
+            dropped_index_list = temp_material_data_df.index.tolist()
+            n = 3 - len(temp_material_data_df)
+
+            # take first 3 rows
+            temp_material_data_df = temp_material_data_df[:3].reset_index(drop=True)
+
+
+    # df_machine_setup.to_excel("machine_setup_2.xlsx", index=False)
+    df = pd.DataFrame(output_data)
+    df.to_excel("output.xlsx", index=False)
 
 
 if __name__ == "__main__":
