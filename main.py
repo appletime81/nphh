@@ -132,7 +132,22 @@ def step3():
             n = 3 - len(temp_material_data_df)
 
             # take first 3 rows
-            temp_material_data_df = temp_material_data_df[:3].reset_index(drop=True)
+            temp_material_data_df = temp_material_data_df.reset_index(drop=True)
+            for j in range(len(temp_material_data_df)):
+                print(temp_material_data_df.loc[j, "LOC"])
+                output_data["LOC"].append(temp_material_data_df.loc[j, "LOC"])
+                output_data["LOT"].append(temp_material_data_df.loc[j, "LOT"])
+                output_data["EQ_NAME"].append(eq_name)
+                output_data["PP_NAME"].append(temp_material_data_df.loc[j, "PP_NAME"])
+                output_data["DEVICE"].append(device)
+                output_data["NPPH"].append(
+                    df_template_1[df_template_1["DEVICE"] == device]["NPPH"].values[0]
+                    if df_template_1[df_template_1["DEVICE"] == device]["NPPH"].values
+                    else np.nan
+                )
+                output_data["Ranking:"].append(j + 1)
+
+            # TODO 找template_1 tl 取 n 個
 
 
     # df_machine_setup.to_excel("machine_setup_2.xlsx", index=False)
