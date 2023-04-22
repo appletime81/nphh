@@ -149,7 +149,6 @@ def step3():
 
             # TODO 找template_1 tl 取 n 個
 
-
     # df_machine_setup.to_excel("machine_setup_2.xlsx", index=False)
     df = pd.DataFrame(output_data)
     df.to_excel("output.xlsx", index=False)
