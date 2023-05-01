@@ -100,10 +100,12 @@ def step3():
         machine_setup_pp_name = df_machine_setup.loc[i, "PP"]
         eq_name = df_machine_setup.loc[i, "EQ_NAME"]
         device = df_machine_setup.loc[i, "DEVICE"]
-        temp_material_data_df = df_bpcwip[
-            (df_bpcwip["PP_NAME"] == machine_setup_pp_name)
-            & (df_bpcwip["STATUS"] == filter_condition["STATUS"])
-        ]
+        temp_material_data_df = deepcopy(
+            df_bpcwip[
+                (df_bpcwip["PP_NAME"] == machine_setup_pp_name)
+                & (df_bpcwip["STATUS"] == filter_condition["STATUS"])
+            ]
+        )
         if len(temp_material_data_df) > 2:
             dropped_index_list = temp_material_data_df.index.tolist()[:3]
 
@@ -145,7 +147,7 @@ def step3():
                     if df_template_1[df_template_1["DEVICE"] == device]["NPPH"].values
                     else np.nan
                 )
-                output_data["Ranking:"].append(j + 1)
+                output_data["Ranking"].append(j + 1)
 
             # TODO 找template_1 tl 取 n 個
 
