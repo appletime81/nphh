@@ -83,6 +83,9 @@ def step3():
     }
 
     df_template_1 = pd.read_excel("template_1.xlsx")
+
+    # sorted by nphh
+    df_template_1 = df_template_1.sort_values(by=["NPPH"], ascending=False).reset_index(drop=True)
     df_machine_setup = pd.read_excel("machine_setup.xlsx")
     df_bpcwip = pd.read_excel("BPCWIP_2.xlsx")
     df_bpcwip = deepcopy(df_bpcwip)[df_bpcwip["PP_NAME"].notnull()]
@@ -149,7 +152,9 @@ def step3():
                 )
                 output_data["Ranking"].append(j + 1)
 
-            # TODO 找template_1 tl 取 n 個
+            #
+
+
 
     # df_machine_setup.to_excel("machine_setup_2.xlsx", index=False)
     df = pd.DataFrame(output_data)
