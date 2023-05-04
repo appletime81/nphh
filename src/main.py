@@ -147,6 +147,7 @@ def step3():
                         temp_material_data_df.loc[j, "PP_NAME"]
                     )
                     output_data["DEVICE"].append(device)
+                    print(df_second[df_second["DEVICE"] == device]["NPPH"].values)
                     output_data["NPPH"].append(
                         df_second[df_second["DEVICE"] == device]["NPPH"].values[0]
                         if df_second[df_second["DEVICE"] == device]["NPPH"].values
