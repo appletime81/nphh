@@ -18,7 +18,7 @@ def step1():
 
     new_dict = {
         "DEVICE": [],
-        "BPC_WIP": [],NPHH
+        "BPC_WIP": [],
         "NPPH": [],
         "24HR": [],
         "Machine_Count": [],
