@@ -14,7 +14,6 @@ def step1():
     df_wip_arrangement = pl.from_pandas(
         pd.read_excel(r"WIP_ARRANGEMENT.xlsx", sheet_name="DEV_DB")
     )
-    # print(df_wip_arrangement)
 
     new_dict = {
         "DEVICE": [],
@@ -35,7 +34,6 @@ def step1():
         except ZeroDivisionError:
             new_dict["Machine_Count"].append(0)
 
-    # pprint(new_dict)
     df_new = pl.from_dict(new_dict)
     df_new.write_excel("template_1.xlsx", table_name="DEV_DB")
 
@@ -114,7 +112,6 @@ def step3():
 
             # add to output_data
             for j in range(len(temp_material_data_df)):
-                # print(temp_material_data_df.loc[j, "LOC"])
                 output_data["LOC"].append(temp_material_data_df.loc[j, "LOC"])
                 output_data["LOT"].append(temp_material_data_df.loc[j, "LOT"])
                 output_data["EQ_NAME"].append(eq_name)
@@ -127,6 +124,9 @@ def step3():
                     else np.nan
                 )
                 output_data["Ranking"].append(j + 1)
+                df_second = df_second.drop(
+                    [df_second[df_second["DEVICE"] == device]["NPPH"].index.tolist()[0]]
+                )
 
             # drop row by index list
             df_bpcwip = df_bpcwip.drop(dropped_index_list)
@@ -147,20 +147,26 @@ def step3():
                         temp_material_data_df.loc[j, "PP_NAME"]
                     )
                     output_data["DEVICE"].append(device)
-                    print(df_second[df_second["DEVICE"] == device]["NPPH"].values)
                     output_data["NPPH"].append(
                         df_second[df_second["DEVICE"] == device]["NPPH"].values[0]
                         if df_second[df_second["DEVICE"] == device]["NPPH"].values
                         else np.nan
                     )
                     output_data["Ranking"].append(count)
+                    df_second = df_second.drop(
+                        [
+                            df_second[df_second["DEVICE"] == device][
+                                "NPPH"
+                            ].values.index.tolist()[0]
+                        ]
+                    )
                     count += 1
                 df_bpcwip = df_bpcwip.drop(dropped_index_list)
 
             # ------------------------ get first three n from Second.xlsx ------------------------
             temp_second_df = deepcopy(df_second.iloc[:n, :])
-            df_second = df_second.drop(df_second.index[:n]).reset_index(
-                drop=True
+            df_second = df_second.drop(
+                df_second.index[:n]
             )  # drop n rows from Second.xlsx
 
             for k in range(len(temp_second_df)):
