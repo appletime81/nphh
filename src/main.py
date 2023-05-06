@@ -124,9 +124,20 @@ def step3():
                     else np.nan
                 )
                 output_data["Ranking"].append(j + 1)
-                df_second = df_second.drop(
-                    [df_second[df_second["DEVICE"] == device]["NPPH"].index.tolist()[0]]
-                )
+                try:
+                    df_second = df_second.drop(
+                        [
+                            df_second[df_second["DEVICE"] == device][
+                                "NPPH"
+                            ].index.tolist()[0]
+                        ]
+                    ).reset_index(drop=True)
+                except IndexError:
+                    print("-" * 100)
+                    print(df_second)
+                    print("-" * 100)
+                    print(df_second[df_second["DEVICE"] == device])
+                    print("-" * 100)
 
             # drop row by index list
             df_bpcwip = df_bpcwip.drop(dropped_index_list)
@@ -136,6 +147,7 @@ def step3():
             # ------------------------ take first 3(<=3) rows ------------------------
             # get first len(temp_material_data_df) rows
             if len(temp_material_data_df) > 0:
+                # print('len(temp_material_data_df) > 0')
                 dropped_index_list = temp_material_data_df.index.tolist()
                 temp_material_data_df = temp_material_data_df.reset_index(drop=True)
                 for j in range(len(temp_material_data_df)):
@@ -149,7 +161,7 @@ def step3():
                     output_data["DEVICE"].append(device)
                     output_data["NPPH"].append(
                         df_second[df_second["DEVICE"] == device]["NPPH"].values[0]
-                        if df_second[df_second["DEVICE"] == device]["NPPH"].values
+                        if len(df_second[df_second["DEVICE"] == device]["NPPH"].values)
                         else np.nan
                     )
                     output_data["Ranking"].append(count)
@@ -157,19 +169,20 @@ def step3():
                         [
                             df_second[df_second["DEVICE"] == device][
                                 "NPPH"
-                            ].values.index.tolist()[0]
+                            ].index.tolist()[0]
                         ]
-                    )
+                    ).reset_index(drop=True)
                     count += 1
                 df_bpcwip = df_bpcwip.drop(dropped_index_list)
 
             # ------------------------ get first three n from Second.xlsx ------------------------
             temp_second_df = deepcopy(df_second.iloc[:n, :])
-            df_second = df_second.drop(
-                df_second.index[:n]
+            df_second = df_second.drop(df_second.index[:n]).reset_index(
+                drop=True
             )  # drop n rows from Second.xlsx
 
             for k in range(len(temp_second_df)):
+                # print('start in len(temp_second_df)')
                 temp_df = deepcopy(
                     df_bpcwip[
                         (df_bpcwip["PP_NAME"] == temp_second_df.loc[k, "PP_NAME"])
