@@ -147,9 +147,11 @@ def step3():
                         temp_material_data_df.loc[j, "PP_NAME"]
                     )
                     output_data["DEVICE"].append(device)
+                    print("-" * 20)
+                    print(df_second[df_second["DEVICE"] == device]["NPPH"].values.tolist())
                     output_data["NPPH"].append(
-                        df_second[df_second["DEVICE"] == device]["NPPH"].values[0]
-                        if df_second[df_second["DEVICE"] == device]["NPPH"].values
+                        df_second[df_second["DEVICE"] == device]["NPPH"].values.tolist()[0]
+                        if df_second[df_second["DEVICE"] == device]["NPPH"].values.tolist()
                         else np.nan
                     )
                     output_data["Ranking"].append(count)
@@ -158,9 +160,9 @@ def step3():
 
             # ------------------------ get first three n from Second.xlsx ------------------------
             temp_second_df = deepcopy(df_second.iloc[:n, :])
-            df_second = df_second.drop(df_second.index[:n]).reset_index(
-                drop=True
-            )  # drop n rows from Second.xlsx
+            # df_second = df_second.drop(df_second.index[:n]).reset_index(
+            #     drop=True
+            # )  # drop n rows from Second.xlsx
 
             for k in range(len(temp_second_df)):
                 temp_df = deepcopy(
