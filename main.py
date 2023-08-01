@@ -8,8 +8,8 @@ from pprint import pprint
 
 def step1():
     """
-    # In WIP_ARRANGEMENT.xlsx, Red col can direct copy paste to template_1,
-    yellow col need to insert the formula in code like what we did in excel
+    # In WIP_ARRANGEMENT.xlsx, Red col can direct copy and paste to template_1,
+    yellow col need to insert the formula in code like what we did in Excel
     """
     df_wip_arrangement = pl.from_pandas(
         pd.read_excel(r"WIP_ARRANGEMENT.xlsx", sheet_name="DEV_DB")
@@ -139,7 +139,7 @@ def step3():
                 dropped_index_list = temp_material_data_df.index.tolist()
                 temp_material_data_df = temp_material_data_df.reset_index(drop=True)
                 for j in range(len(temp_material_data_df)):
-                    print(temp_material_data_df.loc[j, "LOC"])
+                    # print(temp_material_data_df.loc[j, "LOC"])
                     output_data["LOC"].append(temp_material_data_df.loc[j, "LOC"])
                     output_data["LOT"].append(temp_material_data_df.loc[j, "LOT"])
                     output_data["EQ_NAME"].append(eq_name)
@@ -147,11 +147,17 @@ def step3():
                         temp_material_data_df.loc[j, "PP_NAME"]
                     )
                     output_data["DEVICE"].append(device)
-                    print("-" * 20)
-                    print(df_second[df_second["DEVICE"] == device]["NPPH"].values.tolist())
+                    # print("-" * 20)
+                    # print(
+                    #     df_second[df_second["DEVICE"] == device]["NPPH"].values.tolist()
+                    # )
                     output_data["NPPH"].append(
-                        df_second[df_second["DEVICE"] == device]["NPPH"].values.tolist()[0]
-                        if df_second[df_second["DEVICE"] == device]["NPPH"].values.tolist()
+                        df_second[df_second["DEVICE"] == device][
+                            "NPPH"
+                        ].values.tolist()[0]
+                        if df_second[df_second["DEVICE"] == device][
+                            "NPPH"
+                        ].values.tolist()
                         else np.nan
                     )
                     output_data["Ranking"].append(count)
@@ -193,5 +199,7 @@ def step3():
 
 if __name__ == "__main__":
     start_time = time.time()
-    step3()
+    step1()
+    step2()
+    # step3()
     print("--- %s seconds ---" % (time.time() - start_time))
