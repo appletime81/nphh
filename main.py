@@ -83,130 +83,52 @@ def step3():
     }
     filter_condition = {"STATUS": "Non-RTD StandBy"}
 
-    # ---------------------- Second.xlsx ----------------------
-    df_second = pd.read_excel("Second.xlsx")
-    df_second = df_second.sort_values(by=["NPPH"], ascending=False).reset_index(
-        drop=True
-    )  # sorted by nphh
-
-    # ---------------------- BPCWIP_2.xlsx ----------------------
-    df_bpcwip = pd.read_excel("BPCWIP_2.xlsx")
-    df_bpcwip = deepcopy(df_bpcwip)[df_bpcwip["PP_NAME"].notnull()]
-
-    # ---------------------- machine_setup.xlsx ----------------------
+    df_second = (
+        pd.read_excel("Second.xlsx")
+        .sort_values(by=["NPPH"], ascending=False)
+        .reset_index(drop=True)
+    )
+    df_bpcwip = pd.read_excel("BPCWIP_2.xlsx").dropna(subset=["PP_NAME"])
     df_machine_setup = pd.read_excel("machine_setup.xlsx")
 
     for i in range(len(df_machine_setup)):
         machine_setup_pp_name = df_machine_setup.loc[i, "PP"]
         eq_name = df_machine_setup.loc[i, "EQ_NAME"]
         device = df_machine_setup.loc[i, "DEVICE"]
-        temp_material_data_df = deepcopy(
-            df_bpcwip[
-                (df_bpcwip["PP_NAME"] == machine_setup_pp_name)
-                & (df_bpcwip["STATUS"] == filter_condition["STATUS"])
-            ]
-        )
-        if len(temp_material_data_df) > 2:
-            dropped_index_list = temp_material_data_df.index.tolist()[:3]
 
-            # take first 3 rows
-            temp_material_data_df = temp_material_data_df[:3].reset_index(drop=True)
+        temp_material_data_df = df_bpcwip[
+            (df_bpcwip["PP_NAME"] == machine_setup_pp_name)
+            & (df_bpcwip["STATUS"] == filter_condition["STATUS"])
+        ]
 
-            # add to output_data
-            for j in range(len(temp_material_data_df)):
-                # print(temp_material_data_df.loc[j, "LOC"])
-                output_data["LOC"].append(temp_material_data_df.loc[j, "LOC"])
-                output_data["LOT"].append(temp_material_data_df.loc[j, "LOT"])
-                output_data["EQ_NAME"].append(eq_name)
-                output_data["PP_NAME"].append(temp_material_data_df.loc[j, "PP_NAME"])
-                output_data["DEVICE"].append(device)
-                output_data["NPPH"].append(
-                    df_second[df_second["DEVICE"] == device]["NPPH"].values[0]
-                    if len(df_second[df_second["DEVICE"] == device]["NPPH"].values)
-                    else np.nan
-                )
-                output_data["Ranking"].append(j + 1)
+        rows_to_add = temp_material_data_df.iloc[:3]
+        dropped_index_list = rows_to_add.index.tolist()
+        df_bpcwip = df_bpcwip.drop(dropped_index_list)
 
-            # drop row by index list
+        if len(rows_to_add) < 3:
+            temp_second_df_PP_NAME_list = df_second[
+                (df_second["MACHINE_NAME"] == eq_name) & (df_second["DEVICE"] == device)
+            ]["PP_NAME"].values.tolist()
+            additional_rows = df_bpcwip[
+                df_bpcwip["PP_NAME"].isin(temp_second_df_PP_NAME_list)
+            ].iloc[: 3 - len(rows_to_add)]
+            dropped_index_list = additional_rows.index.tolist()
             df_bpcwip = df_bpcwip.drop(dropped_index_list)
-        elif len(temp_material_data_df) <= 2:
-            n = 3 - len(temp_material_data_df)
-            count = 1
-            # ------------------------ take first 3(<=3) rows ------------------------
-            # get first len(temp_material_data_df) rows
-            if len(temp_material_data_df) > 0:
-                dropped_index_list = temp_material_data_df.index.tolist()
-                temp_material_data_df = temp_material_data_df.reset_index(drop=True)
-                for j in range(len(temp_material_data_df)):
-                    # print(temp_material_data_df.loc[j, "LOC"])
-                    output_data["LOC"].append(temp_material_data_df.loc[j, "LOC"])
-                    output_data["LOT"].append(temp_material_data_df.loc[j, "LOT"])
-                    output_data["EQ_NAME"].append(eq_name)
-                    output_data["PP_NAME"].append(
-                        temp_material_data_df.loc[j, "PP_NAME"]
-                    )
-                    output_data["DEVICE"].append(device)
-                    output_data["NPPH"].append(
-                        df_second[df_second["DEVICE"] == device][
-                            "NPPH"
-                        ].values.tolist()[0]
-                        if df_second[df_second["DEVICE"] == device][
-                            "NPPH"
-                        ].values.tolist()
-                        else np.nan
-                    )
-                    output_data["Ranking"].append(count)
-                    count += 1
-                df_bpcwip = df_bpcwip.drop(dropped_index_list)
+            rows_to_add = pd.concat([rows_to_add, additional_rows])
 
-            # ------------------------ get first three n from Second.xlsx ------------------------
-            temp_second_df = deepcopy(df_second)
-            temp_second_df = temp_second_df[
-                (temp_second_df["MACHINE_NAME"] == eq_name)
-                & (temp_second_df["DEVICE"] == device)
-            ]
-            temp_second_df_PP_NAME_list = temp_second_df["PP_NAME"].values.tolist()
-            temp_material_data_df_for_second_df = deepcopy(
-                df_bpcwip[(df_bpcwip["PP_NAME"].isin(temp_second_df_PP_NAME_list))]
-            )
-            # 前 n 個 temp_material_data_df_for_second_df
-            temp_material_data_df_for_second_df = (
-                temp_material_data_df_for_second_df.iloc[:n, :]
-            )
-
-            # drop by index
-            dropped_index_list = temp_material_data_df_for_second_df.index.tolist()
-            df_bpcwip = df_bpcwip.drop(dropped_index_list)
-            print("-" * 50)
-            pprint(temp_second_df_PP_NAME_list)
-            pprint(dropped_index_list)
-            print(temp_material_data_df_for_second_df)
-            for j in dropped_index_list:
-                output_data["LOC"].append(
-                    temp_material_data_df_for_second_df.loc[j, "LOC"]
-                )
-                output_data["LOT"].append(
-                    temp_material_data_df_for_second_df.loc[j, "LOT"]
-                )
-                output_data["EQ_NAME"].append(eq_name)
-                output_data["PP_NAME"].append(
-                    temp_material_data_df_for_second_df.loc[j, "PP_NAME"]
-                )
-                output_data["DEVICE"].append(device)
-
-                nphh_list = df_second[
-                    (df_second["DEVICE"] == device)
-                    & (
-                        df_second["PP_NAME"]
-                        == temp_material_data_df_for_second_df.loc[j, "PP_NAME"]
-                    )
-                    & (df_second["MACHINE_NAME"] == eq_name)
-                ]["NPPH"].values.tolist()
-                output_data["NPPH"].append(
-                    nphh_list[0] if len(nphh_list) > 0 else np.nan
-                )
-                output_data["Ranking"].append(count)
-                count += 1
+        for j, row in rows_to_add.iterrows():
+            nphh_list = df_second[
+                (df_second["DEVICE"] == device)
+                & (df_second["PP_NAME"] == row["PP_NAME"])
+                & (df_second["MACHINE_NAME"] == eq_name)
+            ]["NPPH"].values.tolist()
+            output_data["LOC"].append(row["LOC"])
+            output_data["LOT"].append(row["LOT"])
+            output_data["EQ_NAME"].append(eq_name)
+            output_data["PP_NAME"].append(row["PP_NAME"])
+            output_data["DEVICE"].append(device)
+            output_data["NPPH"].append(nphh_list[0] if len(nphh_list) > 0 else np.nan)
+            output_data["Ranking"].append(j + 1)
 
     df = pd.DataFrame(output_data)
     df.to_excel("output.xlsx", index=False)
@@ -214,7 +136,7 @@ def step3():
 
 if __name__ == "__main__":
     start_time = time.time()
-    # step1()
-    # step2()
+    step1()
+    step2()
     step3()
     print("--- %s seconds ---" % (time.time() - start_time))
