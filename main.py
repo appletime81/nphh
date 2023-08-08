@@ -116,7 +116,9 @@ def step3():
             df_bpcwip = df_bpcwip.drop(dropped_index_list)
             rows_to_add = pd.concat([rows_to_add, additional_rows])
 
+        count = 0
         for j, row in rows_to_add.iterrows():
+            count += 1
             nphh_list = df_second[
                 (df_second["DEVICE"] == device)
                 & (df_second["PP_NAME"] == row["PP_NAME"])
@@ -128,7 +130,7 @@ def step3():
             output_data["PP_NAME"].append(row["PP_NAME"])
             output_data["DEVICE"].append(device)
             output_data["NPPH"].append(nphh_list[0] if len(nphh_list) > 0 else np.nan)
-            output_data["Ranking"].append(j + 1)
+            output_data["Ranking"].append(count)
 
     df = pd.DataFrame(output_data)
     df.to_excel("output.xlsx", index=False)
